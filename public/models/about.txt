@@ -1,0 +1,7 @@
+There is also a very low poly version on layer 3 with only 77000 tris.
+
+There are approximately 19 300 seats.
+
+The playing surface is made up of 4 different variants of a grass texture that i cannot include with the .blend however it can be found here.https://tinyurl.com/mb6sc4h
+
+The sky
