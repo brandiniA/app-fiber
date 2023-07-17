@@ -161,7 +161,7 @@ export const useApp = create((set) => ({
 	visibleAllPlayers: false,
 	setPlay: (play) =>
 		set((state) => ({
-			play: !state.play,
+			play: play
 		})),
 		
 	setSpeed: (speed) =>

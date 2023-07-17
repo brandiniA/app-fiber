@@ -31,6 +31,7 @@ export const PlayersPositions = () => {
         if (statsBombData.length === 0
             || eventIndex === statsBombData.length - 1
             || !play) {
+            console.log("Stopped");
             return;
         }
         const nextEvent = statsBombData[eventIndex + 1];
@@ -124,14 +125,18 @@ export const PlayersPositions = () => {
             
         }
         setMarkers(markersList);
-        if (!useApp.getState().play) return;
+        if (!useApp.getState().play) {
+            console.log("Stopped");
+            return;
+        }
         await sleepAsync(ms / speed);
 
         return startCapturing({ eventIndex: eventIndex + 1 });
-    }, [statsBombData, setPlayers, setMarkers, updateHexagon, addEvent]);
+    }, [statsBombData, setPlayers, setMarkers, updateHexagon, addEvent, useApp, useHexagons]);
 
     useDeepCompareEffect(() => {
         if (statsBombData.length > 0) {
+            console.log("Starting capturing");
             startCapturing({
                 eventIndex: 0,
             });
