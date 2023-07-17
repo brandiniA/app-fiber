@@ -1,5 +1,6 @@
 import { Vector2, Vector3 } from "three";
 
+
 export const setPoligonVertices = (radius, segments) => {
 	const thetaStart = 0;
 	const thetaLength = Math.PI * 2;

@@ -9,7 +9,8 @@
  */
 
 import { Vector3 } from "three";
-import { create } from "zustand";
+import { create, } from "zustand";
+import GUI from "lil-gui";
 
 export const useHexagons = create((set) => ({
 	hexagons: [],
@@ -21,6 +22,25 @@ export const useHexagons = create((set) => ({
 		set((state) => ({
 			hexagons: hexagons,
 		})),
+	updateHexagon: (uuid, hexagon = {}) =>
+		set((state) => {
+			const hexagonIndex = state.hexagons.findIndex((hex) => hex.uuid === uuid);
+			
+			if (hexagonIndex === -1) return;
+
+			const updatedHexagon = {
+				...state.hexagons[hexagonIndex],
+				...hexagon,
+			};
+
+			const updatedHexagons = [...state.hexagons];
+			updatedHexagons[hexagonIndex] = updatedHexagon;
+
+			return {
+				hexagons: updatedHexagons,
+			};
+		}
+	),
 }));
 
 export const useMarkers = create((set) => ({
@@ -43,11 +63,42 @@ export const useMarkers = create((set) => ({
 		})),
 }));
 
+export const useStatsBombData = create((set) => ({
+	teams: [], // Pos1 = Home, Pos2 = Away
+	statsBombData: [],
+	setStatsBombData: (statsBombData) =>
+		set((state) => ({
+			statsBombData: statsBombData,
+		})),
+	setTeams: (teams) =>
+		set((state) => ({
+			teams: teams,
+		})),
+}));
+
+
+// Store of players
 export const usePlayers = create((set) => ({
 	players: [],
-	setInitialPlayers: (players) =>
+	setPlayers: (players) =>
 		set((state) => ({
 			players: players,
+		})),
+	addPlayer: (player) =>
+		set((state) => ({
+			players: [...state.players, player],
+		})),
+}));
+
+export const useEvents = create((set) => ({
+	events: [],
+	setEvents: (events) =>
+		set((state) => ({
+			events: events,
+		})),
+	addEvent: (event) =>
+		set((state) => ({
+			events: [...state.events, event],
 		})),
 }));
 
@@ -88,4 +139,42 @@ export const useCameraInteractor = create((set) => ({
 				positionEnd,
 			},
 		})),
+}));
+
+export const useGui = create((set) => ({
+	gui: new GUI(),
+	setGui: (gui) =>
+		set((state) => ({
+			gui,
+		})),
+}));
+
+export const useApp = create((set) => ({
+	play: false,
+	speed: 1,
+	/**
+	 * 0: normal mode -> hexagon radius is 2
+	 * 1: hexagon mode -> hexagon radius is 3
+	 * 2: hexagon mode -> hexagon radius is 4
+	 */
+	hexagonMode: 0,
+	visibleAllPlayers: false,
+	setPlay: (play) =>
+		set((state) => ({
+			play: !state.play,
+		})),
+		
+	setSpeed: (speed) =>
+		set((state) => ({
+			speed,
+		})),
+	showAllPlayers: (value) =>
+		set((state) => ({
+			showAllPlayers: value,
+		})),
+	setHexagonMode: (hexagonMode) =>
+		set((state) => ({
+			hexagonMode,
+		})),
+		
 }));

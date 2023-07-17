@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import { setPoligonVertices } from "../../helpers/geometry";
 import { SegmentMarker } from "./SegmentMarker";
 
@@ -10,12 +10,14 @@ export const SoccerSegment = ({
 	position,
 	onPointerUp,
 }) => {
+	const refMesh = useRef();
 	// This component is drawn using a custom buffer geometry
 	const [isHovered, setIsHovered] = useState(false);
 
 	const { positions, normals, uvs, indices } = useMemo(() => {
 		const segments = 6;
-		return setPoligonVertices(radius, segments);
+		const vertices = setPoligonVertices(radius, segments);
+		return vertices;
 	}, [radius]);
 
 	const handleOnPointerOver = useCallback((e) => {
@@ -36,10 +38,11 @@ export const SoccerSegment = ({
 	return (
 		<React.Fragment>
 			<mesh
+				ref={refMesh}
 				castShadow
 				receiveShadow
 				position={position}
-				rotation={[-Math.PI / 2, 0, 0]}
+				uuid={uuid}
 				onPointerOver={handleOnPointerOver}
 				onPointerOut={handleOnPointerOut}
 				onPointerUp={handlePointerUp}
@@ -70,7 +73,7 @@ export const SoccerSegment = ({
 						itemSize={1}
 					/>
 				</bufferGeometry>
-				<meshStandardMaterial color={isHovered ? "red" : color} wireframe />
+				<meshBasicMaterial color={isHovered ? "red" : color} wireframe />
 			</mesh>
 			{isHovered && (
 				<SegmentMarker radius={radius} position={position} color={"white"} />

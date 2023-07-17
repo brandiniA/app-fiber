@@ -33,7 +33,7 @@ const SegmentMarker = ({ radius, position, color = "red" }) => {
 			receiveShadow
 		>
 			<cylinderBufferGeometry attach="geometry" args={[radius, radius, 1, 6]} />
-			<meshStandardMaterial color={color} transparent opacity={0.6} />
+			<meshBasicMaterial color={color} transparent opacity={0.6} />
 		</Cylinder>
 	);
 };
@@ -115,7 +115,7 @@ const SoccerField = () => {
 			isMesh
 		>
 			<planeBufferGeometry attach="geometry" args={[width, height]} />
-			<meshStandardMaterial color="green" wireframe />
+			<meshBasicMaterial color="green" wireframe />
 		</Plane>
 	);
 };
