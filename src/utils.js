@@ -45,11 +45,10 @@ export const checkHexVerticesPositionInBounds = ({
 	boundingWidth,
 	boundingHeight,
 }) => {
-	
 	const boundingLeft = -boundingWidth * 0.5 - position[0];
-	const boundingRight = boundingWidth * 0.5 + position[0]
-	const boundingTop = boundingHeight * 0.5 - position[1]
-	const boundingBottom = -boundingHeight * 0.5 + position[1]
+	const boundingRight = boundingWidth * 0.5 + position[0];
+	const boundingTop = boundingHeight * 0.5 - position[1];
+	const boundingBottom = -boundingHeight * 0.5 + position[1];
 	if (
 		hexPosition.x >= boundingLeft &&
 		hexPosition.x <= boundingRight &&
@@ -64,14 +63,12 @@ export const checkHexVerticesPositionInBounds = ({
 
 	const vertices = [];
 
-	let x = hexPosition.x
-	let y = hexPosition.y
+	let x = hexPosition.x;
+	let y = hexPosition.y;
 
-	vertices.push(
-		new Vector3(x, y, 0),
-	);
+	vertices.push(new Vector3(x, y, 0));
 
-	const segments = 24
+	const segments = 24;
 	for (let s = 0; s <= segments; s++) {
 		const segment = thetaStart + (s / segments) * thetaLength;
 		x = hexPosition.x + radius * Math.cos(segment);
@@ -80,7 +77,15 @@ export const checkHexVerticesPositionInBounds = ({
 		vertices.push(new Vector3(x, y, 0));
 	}
 
-	if (vertices.filter((vertex) => vertex.x >= boundingLeft && vertex.x <= boundingRight && vertex.y >= boundingBottom && vertex.y <= boundingTop).length > 3) {
+	if (
+		vertices.filter(
+			(vertex) =>
+				vertex.x >= boundingLeft &&
+				vertex.x <= boundingRight &&
+				vertex.y >= boundingBottom &&
+				vertex.y <= boundingTop
+		).length > 3
+	) {
 		return true;
 	}
 
@@ -110,20 +115,23 @@ export function generateHexagons({
 	const defaultHexagonState = {
 		index: 0,
 		uuid: generateRandomUUID(),
-		relativePosition: new Vector2(x + boundingWidth * 0.5, y + boundingHeight * 0.5),
+		relativePosition: new Vector2(
+			x + boundingWidth * 0.5,
+			y + boundingHeight * 0.5
+		),
 		position: new Vector3(x, y, z),
 		radius,
 		color: "red",
 		opacity: 1,
 		layer: 0,
-		// times a player has been in this hexagon
-		players: 0,
-		// List of players that have been in this hexagon
-		playersList: [],
+		// // times a player has been in this hexagon
+		// players: 0,
+		// // List of players that have been in this hexagon
+		// playersList: [],
 		// times a player has been in this hexagon and has the ball
-		playersWithBall: 0,
+		playersInHexagonCount: 0,
 		// List of players that have been in this hexagon and have the ball
-		playersWithBallList: [],
+		playersInHexagon: {},
 	};
 
 	hexagons.push(defaultHexagonState);
@@ -136,8 +144,6 @@ export function generateHexagons({
 	// const boundingTop = boundingHeight * 0.5 - position[1] + halfRadius;
 	// const boundingBottom = -boundingHeight * 0.5 + position[1] - halfRadius;
 
-
-	
 	// Number of hexagon that are currently drawn in the side
 	let indexHex = 1;
 	// Number of time we get inside the for loop
@@ -156,15 +162,21 @@ export function generateHexagons({
 
 			// console.log(`x: ${x}, y: ${y}`);
 			const hexPos = new Vector3(x, y, z);
-			const hexRelativePos = positionToRelative(hexPos, boundingWidth, boundingHeight);
-
-			if (checkHexVerticesPositionInBounds({
-				position,
-				hexPosition: hexPos,
-				radius,
+			const hexRelativePos = positionToRelative(
+				hexPos,
 				boundingWidth,
-				boundingHeight,
-			})) {
+				boundingHeight
+			);
+
+			if (
+				checkHexVerticesPositionInBounds({
+					position,
+					hexPosition: hexPos,
+					radius,
+					boundingWidth,
+					boundingHeight,
+				})
+			) {
 				const layer = calculateLayerByHexagonIndex(index);
 				hexagons.push({
 					...defaultHexagonState,
@@ -184,12 +196,14 @@ export function generateHexagons({
 		side++;
 	}
 
-
 	return hexagons;
 }
 
 export function positionToRelative(position, boundingWidth, boundingHeight) {
-	return new Vector2(position.x + boundingWidth * 0.5, Math.abs(-position.y + boundingHeight * 0.5));
+	return new Vector2(
+		position.x + boundingWidth * 0.5,
+		Math.abs(-position.y + boundingHeight * 0.5)
+	);
 }
 
 /**
@@ -198,6 +212,14 @@ export function positionToRelative(position, boundingWidth, boundingHeight) {
  * If relative position Y is 80 and boundingHeight is 80, then the position Y is -40
  * So the formula must be: -relativePosition.y + boundingHeight * 0.5
  */
-export function relativeToPosition(relativePosition, boundingWidth, boundingHeight) {
-	return new Vector3(relativePosition.x - boundingWidth * 0.5, -relativePosition.y + boundingHeight * 0.5, 0);
+export function relativeToPosition(
+	relativePosition,
+	boundingWidth,
+	boundingHeight
+) {
+	return new Vector3(
+		relativePosition.x - boundingWidth * 0.5,
+		-relativePosition.y + boundingHeight * 0.5,
+		0
+	);
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { Cylinder, Html } from "@react-three/drei";
 import GUI from "lil-gui";
+import { useApp } from "../../store";
 
 export const SegmentMarker = ({
 	radius,
@@ -10,15 +11,17 @@ export const SegmentMarker = ({
 }) => {
 	const mesh = useRef();
 
+	const visibleAllPlayers = useApp((state) => state.visibleAllPlayers);
+
 	const initialSetup = () => {
 		mesh.current.position.set(...position);
 		// Update the instance's matrix
-		mesh.current.updateMatrix(); // This 
+		mesh.current.updateMatrix(); // This
 		// // Then update the mesh's position based on the matrix
-	}
+	};
 
 	useEffect(() => {
-		initialSetup()
+		initialSetup();
 	}, []);
 
 	return (
@@ -28,8 +31,15 @@ export const SegmentMarker = ({
 			args={[radius, radius, 1, 6, 1]}
 		>
 			<cylinderBufferGeometry attach="geometry" args={[radius, radius, 1, 6]} />
-			<meshBasicMaterial attach="material" color={color}  />
-			{playerData && (
+			<meshBasicMaterial
+				attach="material"
+				color={color}
+				transparent
+				opacity={
+					playerData?.actor || (!playerData?.actor && visibleAllPlayers) ? 1 : 0
+				}
+			/>
+			{/* {playerData && (
 				<Html>
 					<div
 						style={{
@@ -38,16 +48,6 @@ export const SegmentMarker = ({
 							opacity: 0.6,
 						}}
 					>
-						{/* <div
-                        style={{
-                            backgroundColor: "aqua",
-                            // width: "50px",
-                            textAlign: "center",
-                        }}
-                    >
-                        X:<span style={{}}>{player.position.x}</span>/Y:
-                        <span>{player.position.z}</span>
-                    </div> */}
 						<div
 							style={{
 								backgroundColor: "orange",
@@ -66,7 +66,7 @@ export const SegmentMarker = ({
 						</div>
 					</div>
 				</Html>
-			)}
+			)} */}
 		</Cylinder>
 	);
 };

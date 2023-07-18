@@ -1,6 +1,13 @@
-import React, { useState, useCallback, useMemo, useRef, useEffect } from "react";
+import React, {
+	useState,
+	useCallback,
+	useMemo,
+	useRef,
+	useEffect,
+} from "react";
 import { setPoligonVertices } from "../../helpers/geometry";
 import { SegmentMarker } from "./SegmentMarker";
+import { useApp } from "../../store";
 
 export const SoccerSegment = ({
 	title,
@@ -13,6 +20,7 @@ export const SoccerSegment = ({
 	const refMesh = useRef();
 	// This component is drawn using a custom buffer geometry
 	const [isHovered, setIsHovered] = useState(false);
+	const visibleHexagons = useApp((state) => state.visibleHexagons);
 
 	const { positions, normals, uvs, indices } = useMemo(() => {
 		const segments = 6;
@@ -46,6 +54,7 @@ export const SoccerSegment = ({
 				onPointerOver={handleOnPointerOver}
 				onPointerOut={handleOnPointerOut}
 				onPointerUp={handlePointerUp}
+				// visible={true}
 			>
 				<bufferGeometry>
 					<bufferAttribute
@@ -73,7 +82,12 @@ export const SoccerSegment = ({
 						itemSize={1}
 					/>
 				</bufferGeometry>
-				<meshBasicMaterial color={isHovered ? "red" : color} wireframe />
+				<meshBasicMaterial
+					color={isHovered ? "red" : color}
+					transparent
+					opacity={visibleHexagons ? 1 : 0}
+					wireframe
+				/>
 			</mesh>
 			{isHovered && (
 				<SegmentMarker radius={radius} position={position} color={"white"} />

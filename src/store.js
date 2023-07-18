@@ -9,7 +9,7 @@
  */
 
 import { Vector3 } from "three";
-import { create, } from "zustand";
+import { create } from "zustand";
 import GUI from "lil-gui";
 
 export const useHexagons = create((set) => ({
@@ -25,7 +25,7 @@ export const useHexagons = create((set) => ({
 	updateHexagon: (uuid, hexagon = {}) =>
 		set((state) => {
 			const hexagonIndex = state.hexagons.findIndex((hex) => hex.uuid === uuid);
-			
+
 			if (hexagonIndex === -1) return;
 
 			const updatedHexagon = {
@@ -39,8 +39,7 @@ export const useHexagons = create((set) => ({
 			return {
 				hexagons: updatedHexagons,
 			};
-		}
-	),
+		}),
 }));
 
 export const useMarkers = create((set) => ({
@@ -75,7 +74,6 @@ export const useStatsBombData = create((set) => ({
 			teams: teams,
 		})),
 }));
-
 
 // Store of players
 export const usePlayers = create((set) => ({
@@ -153,28 +151,38 @@ export const useApp = create((set) => ({
 	play: false,
 	speed: 1,
 	/**
-	 * 0: normal mode -> hexagon radius is 2
-	 * 1: hexagon mode -> hexagon radius is 3
-	 * 2: hexagon mode -> hexagon radius is 4
+	 * 0: normal mode -> hexagon radius is 1
+	 * 1: hexagon mode -> hexagon radius is 2
+	 * 2: hexagon mode -> hexagon radius is 3
+	 * 3: hexagon mode -> hexagon radius is 4
 	 */
-	hexagonMode: 0,
-	visibleAllPlayers: false,
+	hexagonMode: 1,
+	visibleAllPlayers: true,
+	visibleHexagons: true,
+	visibleCoordinates: true,
 	setPlay: (play) =>
 		set((state) => ({
-			play: play
+			play: play,
 		})),
-		
+
 	setSpeed: (speed) =>
 		set((state) => ({
 			speed,
-		})),
-	showAllPlayers: (value) =>
-		set((state) => ({
-			showAllPlayers: value,
 		})),
 	setHexagonMode: (hexagonMode) =>
 		set((state) => ({
 			hexagonMode,
 		})),
-		
+	setVisibleHexagons: (visibleHexagons) =>
+		set((state) => ({
+			visibleHexagons,
+		})),
+	setVisibleAllPlayers: (visibleAllPlayers) =>
+		set((state) => ({
+			visibleAllPlayers,
+		})),
+	setVisibleCoordinates: (visibleCoordinates) =>
+		set((state) => ({
+			visibleCoordinates,
+		})),
 }));

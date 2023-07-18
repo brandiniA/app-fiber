@@ -6,21 +6,29 @@ import { generateHexagons } from "./../../utils";
 import { Vector3 } from "three";
 import { generateUUID } from "three/src/math/MathUtils";
 
-const MODE_1 = 0
-const MODE_2 = 1
-const MODE_3 = 2
+const MODE_1 = 0;
+const MODE_2 = 1;
+const MODE_3 = 2;
+const MODE_4 = 3;
 
 const HEX_MODE = {
 	[MODE_1]: {
-		radius: 2,
+		radius: 1,
+		layers: 44,
 	},
 	[MODE_2]: {
-		radius: 3,
+		radius: 2,
+		layers: 22,
 	},
 	[MODE_3]: {
-		radius: 4,
+		radius: 3,
+		layers: 15,
 	},
-}
+	[MODE_4]: {
+		radius: 4,
+		layers: 12,
+	},
+};
 
 export const SoccerSegments = ({ width = 120, height = 80 }) => {
 	const hexagonMode = useApp((state) => state.hexagonMode);
@@ -28,22 +36,22 @@ export const SoccerSegments = ({ width = 120, height = 80 }) => {
 		hexagons: state.hexagons,
 		setHexagons: state.setHexagons,
 	}));
-	
-	const { radius } = HEX_MODE[hexagonMode];
+
+	const { radius, layers } = HEX_MODE[hexagonMode];
 	const loadHexagons = useCallback(() => {
-		const hexagons = generateHexagons({
+		const $hexagons = generateHexagons({
 			radius,
 			position: [0, 0, 0],
-			totalHexagons: calculateHexagonsInRound(100),
+			totalHexagons: calculateHexagonsInRound(layers),
 			boundingHeight: height,
 			boundingWidth: width,
 		});
-		setHexagons(hexagons);
-	}, [radius, width, height, setHexagons]);
+		setHexagons($hexagons);
+	}, [radius, layers, width, height, setHexagons]);
 
 	useEffect(() => {
-		loadHexagons();
-	}, [hexagonMode]);
+		if (hexagons.length === 0) loadHexagons();
+	}, [hexagonMode, hexagons.length]);
 
 	const { addMarker } = useMarkers((state) => ({
 		addMarker: state.addMarker,
@@ -72,14 +80,16 @@ export const SoccerSegments = ({ width = 120, height = 80 }) => {
 		[radius, addMarker, width, height]
 	);
 
-	return hexagons.map((segment) => (
-		<SoccerSegment
-			key={`segment-${segment.uuid}`}
-			uuid={segment.uuid}
-			position={segment.position}
-			radius={segment.radius}
-			color={segment.color}
-			onPointerUp={handlePointerUp}
-		/>
-	));
+	return hexagons.map((segment) => {
+		return (
+			<SoccerSegment
+				key={`segment-${segment.uuid}`}
+				uuid={segment.uuid}
+				position={segment.position}
+				radius={segment.radius}
+				color={segment.color}
+				onPointerUp={handlePointerUp}
+			/>
+		);
+	});
 };
