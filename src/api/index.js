@@ -17,25 +17,21 @@ const api = axios.create({
 // });
 
 export const useStatsBomb = () => {
-	const {
-		setStatsBombData,
-		setTeams,
-	} = useStatsBombData((state) =>  ({
+	const { setStatsBombData, setTeams } = useStatsBombData((state) => ({
 		setStatsBombData: state.setStatsBombData,
 		setTeams: state.setTeams,
 	}));
 
 	const fetch = useCallback(async () => {
+		setStatsBombData([]);
+		setTeams([]);
+
 		const res = await api.get("soccer/statsbomb/test", {});
 		const { team_a: teamA, team_b: teamB, events } = res.data;
 		setTeams([teamA, teamB]);
-	
+
 		setStatsBombData(
-			events.map(({
-				players,
-				event_uuid: eventUUID,
-				...data
-			}) => {
+			events.map(({ players, event_uuid: eventUUID, ...data }) => {
 				return {
 					eventUUID,
 					players: players.map(({ location, position, ...rest }) => {
@@ -47,16 +43,16 @@ export const useStatsBomb = () => {
 							position: pos,
 							relativePosition: relpos,
 							location,
-						} 
+						};
 					}),
-					time: `${data.minute}:${data.second}}`,
-					...data
-				}
+					time: `${data.minute}:${data.second}`,
+					...data,
+				};
 			})
 		);
 	}, [setStatsBombData, setTeams]);
 
-	return fetch
+	return fetch;
 };
 
 // export const useGetLineupDetail = () => {

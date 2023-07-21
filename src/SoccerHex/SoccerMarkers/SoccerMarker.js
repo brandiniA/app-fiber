@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import { Cylinder, Html } from "@react-three/drei";
 import GUI from "lil-gui";
-import { useApp } from "../../store";
 
-export const SegmentMarker = ({
+import { useSoccerHex } from "../SoccerHex";
+
+export const SoccerMarker = ({
 	radius,
 	position,
 	color = "red",
@@ -13,7 +14,7 @@ export const SegmentMarker = ({
 }) => {
 	const mesh = useRef();
 
-	const visibleAllPlayers = useApp((state) => state.visibleAllPlayers);
+	const visibleMarkers = useSoccerHex((state) => state.visibleMarkers);
 
 	const initialSetup = () => {
 		mesh.current.position.set(...position);
@@ -26,11 +27,6 @@ export const SegmentMarker = ({
 		initialSetup();
 	}, []);
 
-	const $opacity = useMemo(() => {
-		if (!isPlayer || visibleAllPlayers) return opacity;
-		return 0;
-	}, [visibleAllPlayers, isPlayer, opacity]);
-
 	return (
 		<Cylinder
 			ref={mesh}
@@ -42,7 +38,8 @@ export const SegmentMarker = ({
 				attach="material"
 				color={color}
 				transparent
-				opacity={$opacity}
+				visible={!isPlayer || (isPlayer && visibleMarkers)}
+				opacity={opacity}
 			/>
 			{/* {playerData && (
 				<Html>

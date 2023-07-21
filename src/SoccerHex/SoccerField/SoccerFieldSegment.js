@@ -1,21 +1,23 @@
 import React, { useState, useCallback, useMemo, useRef } from "react";
 import { setPoligonVertices } from "../../helpers/geometry";
-import { SegmentMarker } from "./SegmentMarker";
-import { useApp } from "../../store";
+import { useSoccerHex } from "../SoccerHex";
+import { SoccerMarker } from "../SoccerMarkers";
+// import { SegmentMarker } from "./SegmentMarker";
+// import { useApp } from "../../store";
 
-export const SoccerSegment = ({
-	title,
+export const SoccerFieldSegment = ({
+	selected = false,
 	uuid,
 	radius,
 	color,
 	position,
 	onPointerUp,
-	selected = false,
 }) => {
+	const visibleHexagons = useSoccerHex((state) => state.visibleHexagons);
 	const refMesh = useRef();
 	// This component is drawn using a custom buffer geometry
 	const [isHovered, setIsHovered] = useState(false);
-	const visibleHexagons = useApp((state) => state.visibleHexagons);
+	// const visibleHexagons = useApp((state) => state.visibleHexagons);
 
 	const { positions, normals, uvs, indices } = useMemo(() => {
 		const segments = 6;
@@ -23,20 +25,9 @@ export const SoccerSegment = ({
 		return vertices;
 	}, [radius]);
 
-	const handleOnPointerOver = useCallback((e) => {
-		setIsHovered(true);
-	}, []);
-
-	const handleOnPointerOut = useCallback((e) => {
-		setIsHovered(false);
-	}, []);
-
-	const handlePointerUp = useCallback(
-		(e) => {
-			onPointerUp(e);
-		},
-		[onPointerUp]
-	);
+	const handleOnPointerOver = () => setIsHovered(true);
+	const handleOnPointerOut = (e) => setIsHovered(false);
+	const handlePointerUp = (e) => onPointerUp(e);
 
 	return (
 		<React.Fragment>
@@ -78,14 +69,14 @@ export const SoccerSegment = ({
 					/>
 				</bufferGeometry>
 				<meshBasicMaterial
-					color={isHovered ? "red" : color}
+					color={isHovered ? "black" : color}
 					transparent
+					wireframe={true}
 					opacity={visibleHexagons ? 1 : 0}
-					wireframe
 				/>
 			</mesh>
 			{selected && (
-				<SegmentMarker
+				<SoccerMarker
 					radius={radius}
 					position={position}
 					color={"blue"}

@@ -8,16 +8,7 @@ export const SocckerMarkers = () => {
 	return (
 		<>
 			{markers.map((marker) => {
-				const [x, y, z] = marker.position;
-				return (
-					<SegmentMarker
-						key={marker.uuid}
-						radius={marker.radius}
-						position={[x, y, z]}
-						color={marker.color}
-						playerData={marker?.playerData}
-					/>
-				);
+				return <SegmentMarker key={marker.uuid} {...marker} />;
 			})}
 		</>
 	);

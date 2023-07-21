@@ -29,17 +29,63 @@ export const HexagonsInfo = () => {
 	const [tabSelected, setTabSelected] = useState("hexagons");
 	const hexagons = useHexagons((state) => state.hexagons);
 
-	const hexagonsWithPlayers = useMemo(() => {
-		const $hexagons = hexagons.filter(
-			(hexagon) => hexagon.playersInHexagonCount > 0
-		);
+	// const hexagonsWithPlayers = useMemo(() => {
+	// 	const $hexagons = hexagons.filter(
+	// 		(hexagon) => hexagon.playersInHexagonCount > 0
+	// 	);
 
-		const $hexagonsObj = $hexagons.reduce((acc, hexagon) => {
-			Object.keys(hexagon.playersInHexagon).forEach((playerName) => {
-				const player = hexagon.playersInHexagon[playerName];
-				acc[`hexagon-${hexagon.uuid}-player-${playerName}`] = {
-					...player,
-					...player.events.reduce(
+	// 	const $hexagonsObj = $hexagons.reduce((acc, hexagon) => {
+	// 		Object.keys(hexagon.playersInHexagon).forEach((playerName) => {
+	// 			const player = hexagon.playersInHexagon[playerName];
+	// 			acc[`hexagon-${hexagon.uuid}-player-${playerName}`] = {
+	// 				...player,
+	// 				...player.events.reduce(
+	// 					(acc, event) => {
+	// 						if (EVENTS_TO_SHOW.includes(event.type)) {
+	// 							acc[event.type] += EVENTS_POINTS[event.type];
+	// 							acc.TotalPoints += EVENTS_POINTS[event.type];
+	// 						}
+	// 						return acc;
+	// 						// Sum total points
+	// 					},
+	// 					{
+	// 						...EVENTS_TO_SHOW.reduce(
+	// 							(acc, event) => ({ ...acc, [event]: 0 }),
+	// 							{}
+	// 						),
+	// 						TotalPoints: 0,
+	// 					}
+	// 				),
+	// 				hexagonUUID: hexagon.uuid,
+	// 				// playerUUID,
+	// 			};
+	// 		});
+	// 		return acc;
+	// 	}, {});
+
+	// 	return Object.keys($hexagonsObj)
+	// 		.map((key) => ({
+	// 			key,
+	// 			...$hexagonsObj[key],
+	// 		}))
+	// 		.sort((a, b) => b.name - a.name);
+	// }, [hexagons]);
+
+	const $hexagons = useMemo(() => {
+		return hexagons
+			.filter((hexagon) => hexagon.playersInHexagonCount > 0)
+			.map((hexagon) => {
+				const newState = {
+					hexagonUUID: hexagon.uuid,
+					...EVENTS_TO_SHOW.reduce(
+						(acc, event) => ({ ...acc, [event]: 0 }),
+						{}
+					),
+					TotalPoints: 0,
+				};
+
+				Object.values(hexagon.playersInHexagon).forEach((player) => {
+					const eventsPoints = player.events.reduce(
 						(acc, event) => {
 							if (EVENTS_TO_SHOW.includes(event.type)) {
 								acc[event.type] += EVENTS_POINTS[event.type];
@@ -55,20 +101,15 @@ export const HexagonsInfo = () => {
 							),
 							TotalPoints: 0,
 						}
-					),
-					hexagonUUID: hexagon.uuid,
-					// playerUUID,
-				};
-			});
-			return acc;
-		}, {});
+					);
 
-		return Object.keys($hexagonsObj)
-			.map((key) => ({
-				key,
-				...$hexagonsObj[key],
-			}))
-			.sort((a, b) => b.name - a.name);
+					Object.keys(eventsPoints).forEach((event) => {
+						newState[event] += eventsPoints[event];
+					});
+				});
+
+				return newState;
+			});
 	}, [hexagons]);
 
 	const players = useMemo(() => {
@@ -205,8 +246,6 @@ export const HexagonsInfo = () => {
 									>
 										<th>Hexagon UUID</th>
 										{/* <th>Player UUID</th> */}
-										<th>Player</th>
-										<th>Team</th>
 										{EVENTS_TO_SHOW.map((event) => (
 											<th key={event}>{event.slice(0, 4)}</th>
 										))}
@@ -214,7 +253,7 @@ export const HexagonsInfo = () => {
 									</tr>
 								</thead>
 								<tbody>
-									{hexagonsWithPlayers.map((hexagonWithPlayer) => (
+									{$hexagons.map((hexagonWithPlayer) => (
 										<tr
 											key={hexagonWithPlayer.key}
 											style={{ border: "1px solid black" }}
@@ -225,13 +264,6 @@ export const HexagonsInfo = () => {
 												0,
 												8
 											)}...${hexagonWithPlayer.hexagonUUID.slice(-4)}`}</td>
-											{/* <td>{hexagonWithPlayer.playerUUID}</td> */}
-											<td style={tdStyle}>
-												{hexagonWithPlayer.name.slice(0, 8)}
-											</td>
-											<td style={tdStyle}>
-												{hexagonWithPlayer.team.slice(0, 3)}
-											</td>
 											{EVENTS_TO_SHOW.map((event) => (
 												<td key={event} style={tdStyle}>
 													{hexagonWithPlayer[event]}

@@ -97,7 +97,7 @@ export function generateHexagons({
 	boundingHeight = 80,
 	position = [0, 0, 0],
 	radius = 2,
-	totalHexagons = 1,
+	layers = 1,
 }) {
 	const hexagons = [];
 
@@ -110,6 +110,7 @@ export function generateHexagons({
 	const angle = Math.PI / 3;
 	const apothem = (radius * Math.sqrt(3)) / 2;
 
+	const totalHexagons = calculateHexagonsInRound(layers);
 	let $count = totalHexagons;
 
 	const defaultHexagonState = {

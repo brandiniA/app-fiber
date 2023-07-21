@@ -42,7 +42,7 @@ export const SoccerSegments = ({ width = 120, height = 80 }) => {
 		const $hexagons = generateHexagons({
 			radius,
 			position: [0, 0, 0],
-			totalHexagons: calculateHexagonsInRound(layers),
+			layers,
 			boundingHeight: height,
 			boundingWidth: width,
 		});
@@ -53,10 +53,13 @@ export const SoccerSegments = ({ width = 120, height = 80 }) => {
 		if (hexagons.length === 0) loadHexagons();
 	}, [hexagonMode, hexagons.length]);
 
-	const { addMarker } = useMarkers((state) => ({
-		addMarker: state.addMarker,
-		removeMarker: state.removeMarker,
-	}));
+	const { selectedHexagons, addSelectedHexagon, removeSelectedHexagon } =
+		useHexagons((state) => ({
+			selectedHexagons: state.selectedHexagons,
+			addSelectedHexagon: state.addSelectedHexagon,
+			removeSelectedHexagon: state.removeSelectedHexagon,
+		}));
+
 	// const moved = useCameraInteractor((state) => state.controlsState.moved);
 
 	const handlePointerUp = useCallback(
@@ -64,26 +67,20 @@ export const SoccerSegments = ({ width = 120, height = 80 }) => {
 			event.stopPropagation();
 			// if (moved) return;
 			const { eventObject } = event;
-			const [x, y, z] = eventObject.position;
-			addMarker({
-				id: generateUUID(),
-				position: new Vector3(x, y, z + 0.5),
-				relativePosition: positionToRelative(
-					new Vector3(x, y, z + 0.5),
-					width,
-					height
-				),
-				color: "red",
-				radius,
-			});
+			if (selectedHexagons[eventObject.uuid]) {
+				removeSelectedHexagon(eventObject.uuid);
+			} else {
+				addSelectedHexagon(eventObject.uuid);
+			}
 		},
-		[radius, addMarker, width, height]
+		[addSelectedHexagon, removeSelectedHexagon, selectedHexagons]
 	);
 
 	return hexagons.map((segment) => {
 		return (
 			<SoccerSegment
 				key={`segment-${segment.uuid}`}
+				selected={selectedHexagons[segment.uuid]}
 				uuid={segment.uuid}
 				position={segment.position}
 				radius={segment.radius}

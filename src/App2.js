@@ -32,7 +32,7 @@ const SegmentMarker = ({ radius, position, color = "red" }) => {
 			rotation={[Math.PI / 2, Math.PI / 6, 0]}
 			receiveShadow
 		>
-			<cylinderBufferGeometry attach="geometry" args={[radius, radius, 1, 6]} />
+			<cylinderGeometry attach="geometry" args={[radius, radius, 1, 6]} />
 			<meshBasicMaterial color={color} transparent opacity={0.6} />
 		</Cylinder>
 	);

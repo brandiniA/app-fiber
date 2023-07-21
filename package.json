@@ -4,6 +4,7 @@
 	"private": true,
 	"proxy": "http://127.0.0.1:8000",
 	"dependencies": {
+		"@react-three/csg": "^3.0.0",
 		"@react-three/drei": "^9.77.0",
 		"@react-three/fiber": "^8.13.3",
 		"@react-three/flex": "^1.0.1",

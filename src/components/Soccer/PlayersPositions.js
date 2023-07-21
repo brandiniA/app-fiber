@@ -102,12 +102,18 @@ export const PlayersPositions = () => {
 							hex.relativePosition.distanceTo($player.relativePosition) <=
 							hex.radius
 					);
+				const selectedHexagons = useHexagons.getState().selectedHexagons;
+
 				if (!hexagon) {
 					console.log("No hexagon found for player", $player);
 					continue;
 				}
 				// Update hexagon with player
-				if (hexagon && $player.actor && !EVENTS_EXCLUDED.includes(event.type)) {
+				if (
+					selectedHexagons?.[hexagon.uuid] &&
+					$player.actor &&
+					!EVENTS_EXCLUDED.includes(event.type)
+				) {
 					updateHexagon(hexagon.uuid, {
 						playersInHexagonCount: hexagon.playersInHexagonCount + 1,
 						playersInHexagon: {
@@ -151,12 +157,17 @@ export const PlayersPositions = () => {
 						color,
 						radius: hexagon.radius,
 						hexagonUUID: hexagon.uuid,
+						isPlayer: true,
+						opacity: 1,
+						actor: $player.actor,
 					});
 				} else if (markerIndex !== -1 && $player.actor) {
 					markersList[markerIndex] = {
 						...markersList[markerIndex],
 						color: "aqua",
+						isPlayer: true,
 						playerData: $player,
+						actor: $player.actor,
 					};
 				}
 			}

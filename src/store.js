@@ -13,6 +13,7 @@ import { create } from "zustand";
 import GUI from "lil-gui";
 
 export const useHexagons = create((set) => ({
+	selectedHexagons: {},
 	hexagons: [],
 	addHexagon: (hexagon) =>
 		set((state) => ({
@@ -40,6 +41,29 @@ export const useHexagons = create((set) => ({
 				hexagons: updatedHexagons,
 			};
 		}),
+	addSelectedHexagon: (uuid) =>
+		set((state) => ({
+			selectedHexagons: {
+				...state.selectedHexagons,
+				[uuid]: true,
+			},
+		})),
+	setSelectedHexagons: (selectedHexagons) =>
+		set((state) => ({
+			selectedHexagons: selectedHexagons,
+		})),
+	removeSelectedHexagon: (uuid) =>
+		set((state) => ({
+			selectedHexagons: Object.keys(state.selectedHexagons).reduce(
+				(acc, key) => {
+					if (key !== uuid) {
+						acc[key] = true;
+					}
+					return acc;
+				},
+				{}
+			),
+		})),
 }));
 
 export const useMarkers = create((set) => ({
@@ -140,7 +164,7 @@ export const useCameraInteractor = create((set) => ({
 }));
 
 export const useGui = create((set) => ({
-	gui: new GUI(),
+	gui: null,
 	setGui: (gui) =>
 		set((state) => ({
 			gui,
