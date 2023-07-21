@@ -1,21 +1,17 @@
+import React from "react";
+import { Plane } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
+import { createRef, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
-import { useState, useRef, createRef } from "react";
-import { useFrame, Canvas } from "@react-three/fiber";
-import { OrbitControls, Plane, TorusKnot } from "@react-three/drei";
 
-const getClippedMat = (planes) => ({
-	color: 0xffc107,
-	metalness: 0.1,
-	roughness: 0.75,
+export const getClippedMat = (planes) => ({
+	color: "red",
 	clippingPlanes: planes,
 	clipShadows: true,
 	shadowSide: THREE.DoubleSide,
 });
-
-const getPlaneMat = (plane) => ({
-	color: 0xff0000,
-	metalness: 0.1,
-	roughness: 0.75,
+export const getPlaneMat = (plane) => ({
+	color: "yellow",
 	clippingPlanes: plane,
 	stencilWrite: true,
 	stencilRef: 0,
@@ -24,12 +20,11 @@ const getPlaneMat = (plane) => ({
 	stencilZFail: THREE.ReplaceStencilOp,
 	stencilZPass: THREE.ReplaceStencilOp,
 });
-
-function PlaneStencilGroup({
+export function PlaneStencilGroup({
 	geometry,
 	plane,
-	position = new THREE.Vector3(0, 0, 0),
 	renderOrder,
+	position = new THREE.Vector3(0, 0, 0),
 }) {
 	const mat = {
 		depthWrite: false,
@@ -67,9 +62,21 @@ function PlaneStencilGroup({
 	);
 }
 
-const Clipping = ({ args = [1, 0.2, 220, 60] }) => {
+const StencilBox = ({
+	children,
+	geometry,
+	boundingWidth = 120,
+	boundingHeight = 80,
+	boundingDepth = 10,
+	offsetWidth = 0,
+	offsetHeight = 0,
+	...props
+}) => {
 	const ref = useRef();
-	const [planes] = useState(() => [[-1, 0, 0], [1,0,0], [0,-1,0], [0,1,0], [0,0,-1], [0,0,1]].map(v => new THREE.Plane(new THREE.Vector3(...v), 1))) // prettier-ignore
+	const halfWidth = boundingWidth * 0.5 + offsetWidth;
+	const halfHeight = boundingHeight * 0.5 + offsetHeight;
+	const halfDepth = boundingDepth * 0.5;
+	const [planes] = useState(() => [[-halfWidth, 0,0], [halfWidth,0,0], [0,-halfHeight,0], [0,halfHeight,0], [0,0,-halfDepth], [0,0,halfDepth]].map(v => new THREE.Plane(new THREE.Vector3(...v), 1))) // prettier-ignore
 	const [planeObjects] = useState(() => [
 		createRef(),
 		createRef(),
@@ -93,26 +100,25 @@ const Clipping = ({ args = [1, 0.2, 220, 60] }) => {
 		});
 	});
 
+	const $children = React.Children.map(children, (child, ci) => {
+		if (React.isValidElement(child)) {
+			const { position } = child.props;
+			return React.cloneElement(child, {
+				...child.props,
+				clippedMaterial: getClippedMat(planes),
+				renderOrder: ci + 6,
+				position,
+			});
+		}
+		return child;
+	});
+
 	return (
 		<group>
-			<group ref={ref}>
-				<TorusKnot args={args} renderOrder={7} rotation={[0, 0, Math.PI * 0.5]}>
-					<meshStandardMaterial {...getClippedMat(planes)} />
-				</TorusKnot>
-				<TorusKnot args={args} renderOrder={6}>
-					<meshStandardMaterial {...getClippedMat(planes)} />
-				</TorusKnot>
-				{planes.map((plane, i) => (
-					<PlaneStencilGroup
-						geometry={new THREE.TorusKnotBufferGeometry(...args)}
-						plane={plane}
-						renderOrder={i + 1}
-					/>
-				))}
-			</group>
-			{planes.map((p, i) => (
-				<planeHelper key={`0${i}`} args={[p, 2, 0xffffff]} />
-			))}
+			<group ref={ref}>{$children}</group>
+			{/* {planes.map((p, i) => (
+				<planeHelper key={`0${i}`} args={[p, 10, "red"]} />
+			))} */}
 			{planeObjects.map((planeRef, index) => (
 				<Plane
 					key={`0${index}`}
@@ -129,29 +135,4 @@ const Clipping = ({ args = [1, 0.2, 220, 60] }) => {
 		</group>
 	);
 };
-
-export function ClippingScene2() {
-	return (
-		<div
-			style={{
-				width: "100%",
-				overflow: "hidden",
-				height: "600px",
-				backgroundColor: "black",
-			}}
-		>
-			<Canvas
-				dpr={[1, 2]}
-				camera={{ position: [1, 0, 2] }}
-				onCreated={({ gl }) => {
-					gl.localClippingEnabled = true;
-				}}
-			>
-				{" "}
-				<ambientLight />
-				<Clipping />
-				<OrbitControls />
-			</Canvas>
-		</div>
-	);
-}
+export default StencilBox;

@@ -1,24 +1,50 @@
-import React from "react";
-import { Sphere, Html } from "@react-three/drei";
+import React, { useEffect } from "react";
+import { Html, Cone, Plane, useTexture } from "@react-three/drei";
 import { useSoccerHex } from "../SoccerHex";
 
 export const SoccerPlayers = () => {
+	const cursorRef = React.useRef();
 	const { players, visiblePlayers } = useSoccerHex((state) => ({
 		players: state.players,
 		visiblePlayers: state.visiblePlayers,
 	}));
 	// Set players based on the current event index
+	const texture = useTexture("textures/player_cursor.jpg");
+
+	useEffect(() => {
+		console.log("cursorRef", cursorRef);
+		const map = cursorRef.current?.material.alphaMap;
+		console.log("map", map);
+	}, []);
 
 	return (
 		<group>
 			{players.map((player) => {
 				return (
-					<Sphere
-						key={player.uuid}
-						position={player.position}
-						args={[0.5, 32, 32]}
-					>
-						<meshBasicMaterial color={player.color} visible={visiblePlayers} />
+					<group key={player.uuid}>
+						<Cone
+							key={player.uuid}
+							position={[player.position.x, player.position.y, 3]}
+							args={[2, 5, 32, 32]}
+							rotation={[-Math.PI / 2, 0, 0]}
+						>
+							<meshBasicMaterial
+								color={player.color}
+								visible={visiblePlayers}
+							/>
+						</Cone>
+						<Plane
+							ref={cursorRef}
+							position={[player.position.x, player.position.y, 0.1]}
+							args={[4, 4]}
+						>
+							<meshBasicMaterial
+								color={player.actor ? "aqua" : player.color}
+								visible={visiblePlayers}
+								alphaMap={texture}
+								transparent
+							/>
+						</Plane>
 						{player.actor && (
 							<Html>
 								<div
@@ -65,7 +91,7 @@ export const SoccerPlayers = () => {
 								</div>
 							</Html>
 						)}
-					</Sphere>
+					</group>
 				);
 			})}
 		</group>

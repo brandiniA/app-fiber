@@ -24,6 +24,7 @@ export const SoccerPlayersManager = () => {
 			time: `${event.minute}:${event.second}`,
 		};
 
+		console.log("event", event);
 		setPlayers(
 			event.players.map((player) => ({
 				uuid: generateRandomUUID(),

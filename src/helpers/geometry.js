@@ -1,5 +1,4 @@
-import { Vector2, Vector3 } from "three";
-
+import * as THREE from "three";
 
 export const setPoligonVertices = (radius, segments) => {
 	const thetaStart = 0;
@@ -10,8 +9,8 @@ export const setPoligonVertices = (radius, segments) => {
 	const normals = [];
 	const uvs = [];
 
-	const vertex = new Vector3();
-	const uv = new Vector2();
+	const vertex = new THREE.Vector3();
+	const uv = new THREE.Vector2();
 
 	vertices.push(0, 0, 0);
 	normals.push(0, 0, 1);
@@ -51,4 +50,19 @@ export const setPoligonVertices = (radius, segments) => {
 		normals: new Float32Array(normals),
 		uvs: new Float32Array(uvs),
 	};
+};
+
+export const createHexagonGeometry = (radius) => {
+	const segments = 6;
+	const { positions, normals, uvs, indices } = setPoligonVertices(
+		radius,
+		segments
+	);
+	const geometry = new THREE.BufferGeometry();
+	geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+	geometry.setAttribute("normal", new THREE.BufferAttribute(normals, 3));
+	geometry.setAttribute("uv", new THREE.BufferAttribute(uvs, 2));
+	geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+
+	return geometry;
 };

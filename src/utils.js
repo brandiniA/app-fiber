@@ -111,6 +111,7 @@ export function generateHexagons({
 	const apothem = (radius * Math.sqrt(3)) / 2;
 
 	const totalHexagons = calculateHexagonsInRound(layers);
+
 	let $count = totalHexagons;
 
 	const defaultHexagonState = {
@@ -122,7 +123,7 @@ export function generateHexagons({
 		),
 		position: new Vector3(x, y, z),
 		radius,
-		color: "red",
+		color: "gray",
 		opacity: 1,
 		layer: 0,
 		// // times a player has been in this hexagon
@@ -174,8 +175,8 @@ export function generateHexagons({
 					position,
 					hexPosition: hexPos,
 					radius,
-					boundingWidth,
-					boundingHeight,
+					boundingWidth: boundingWidth + radius * 2,
+					boundingHeight: boundingHeight + radius * 2,
 				})
 			) {
 				const layer = calculateLayerByHexagonIndex(index);

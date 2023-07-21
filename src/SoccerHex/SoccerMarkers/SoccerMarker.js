@@ -11,6 +11,7 @@ export const SoccerMarker = ({
 	playerData,
 	isPlayer = false,
 	opacity = 1,
+	clippedMaterial,
 }) => {
 	const mesh = useRef();
 
@@ -36,6 +37,7 @@ export const SoccerMarker = ({
 			<cylinderGeometry attach="geometry" args={[radius, radius, 1, 6]} />
 			<meshBasicMaterial
 				attach="material"
+				{...clippedMaterial}
 				color={color}
 				transparent
 				visible={!isPlayer || (isPlayer && visibleMarkers)}

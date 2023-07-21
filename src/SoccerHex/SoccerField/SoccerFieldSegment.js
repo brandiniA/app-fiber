@@ -1,7 +1,12 @@
 import React, { useState, useCallback, useMemo, useRef } from "react";
-import { setPoligonVertices } from "../../helpers/geometry";
+import {
+	createHexagonGeometry,
+	setPoligonVertices,
+} from "../../helpers/geometry";
 import { useSoccerHex } from "../SoccerHex";
 import { SoccerMarker } from "../SoccerMarkers";
+import StencilBox from "../../Scenes/StencilBox";
+import * as THREE from "three";
 // import { SegmentMarker } from "./SegmentMarker";
 // import { useApp } from "../../store";
 
@@ -12,22 +17,25 @@ export const SoccerFieldSegment = ({
 	color,
 	position,
 	onPointerUp,
+	renderOrder,
+	clippedMaterial,
 }) => {
+	const geometry = useRef(createHexagonGeometry(radius));
 	const visibleHexagons = useSoccerHex((state) => state.visibleHexagons);
 	const refMesh = useRef();
 	// This component is drawn using a custom buffer geometry
 	const [isHovered, setIsHovered] = useState(false);
 	// const visibleHexagons = useApp((state) => state.visibleHexagons);
 
-	const { positions, normals, uvs, indices } = useMemo(() => {
-		const segments = 6;
-		const vertices = setPoligonVertices(radius, segments);
-		return vertices;
-	}, [radius]);
-
-	const handleOnPointerOver = () => setIsHovered(true);
+	const handleOnPointerOver = (e) => setIsHovered(true);
 	const handleOnPointerOut = (e) => setIsHovered(false);
 	const handlePointerUp = (e) => onPointerUp(e);
+
+	const $opacity = useMemo(() => {
+		if (isHovered) return 0.7;
+		// return 1;
+		return 0.05;
+	}, [isHovered]);
 
 	return (
 		<React.Fragment>
@@ -40,47 +48,25 @@ export const SoccerFieldSegment = ({
 				onPointerOver={handleOnPointerOver}
 				onPointerOut={handleOnPointerOut}
 				onPointerUp={handlePointerUp}
-				// visible={true}
+				geometry={geometry.current}
+				renderOrder={6}
 			>
-				<bufferGeometry>
-					<bufferAttribute
-						attach="attributes-position"
-						array={positions}
-						count={positions.length / 3}
-						itemSize={3}
-					/>
-					<bufferAttribute
-						attach="attributes-normal"
-						array={normals}
-						count={normals.length / 3}
-						itemSize={3}
-					/>
-					<bufferAttribute
-						attach="attributes-uv"
-						array={uvs}
-						count={uvs.length / 2}
-						itemSize={2}
-					/>
-					<bufferAttribute
-						attach="index"
-						array={indices}
-						count={indices.length}
-						itemSize={1}
-					/>
-				</bufferGeometry>
 				<meshBasicMaterial
-					color={isHovered ? "black" : color}
 					transparent
-					wireframe={true}
-					opacity={visibleHexagons ? 1 : 0}
+					// wireframe
+					visible={visibleHexagons}
+					opacity={$opacity}
+					{...clippedMaterial}
+					color={isHovered ? "gray" : color}
 				/>
 			</mesh>
 			{selected && (
 				<SoccerMarker
 					radius={radius}
 					position={position}
-					color={"blue"}
-					opacity={0.3}
+					color={isHovered ? "black" : color}
+					opacity={0.7}
+					clippedMaterial={clippedMaterial}
 				/>
 			)}
 		</React.Fragment>

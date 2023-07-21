@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useEffect } from "react";
-import { Sphere, Html } from "@react-three/drei";
+import { Sphere, Html, Cone } from "@react-three/drei";
 import {
 	useApp,
 	usePlayers,
@@ -205,10 +205,10 @@ export const PlayersPositions = () => {
 		<group ref={playersRef}>
 			{players.map((player, index) => {
 				return (
-					<Sphere
+					<Cone
 						key={player.uuid}
 						position={player.position}
-						args={[0.5, 32, 32]}
+						args={[0.5, 2, 32, 32]}
 					>
 						<meshBasicMaterial color={player.color} />
 						{player.actor && (
@@ -257,7 +257,7 @@ export const PlayersPositions = () => {
 								</div>
 							</Html>
 						)}
-					</Sphere>
+					</Cone>
 				);
 			})}
 		</group>

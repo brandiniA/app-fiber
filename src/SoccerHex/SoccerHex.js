@@ -32,6 +32,7 @@ import { HexagonsInfo } from "../components/HexagonsInfo";
 import Events from "../components/Events";
 import { create } from "zustand";
 import { SoccerDebugManager } from "./SoccerDebugManager";
+import { Sky } from "@react-three/drei";
 
 export const MODE_1 = 0;
 export const MODE_2 = 1;
@@ -45,7 +46,7 @@ export const HEX_MODE = {
 	},
 	[MODE_2]: {
 		radius: 2,
-		layers: 22,
+		layers: 24,
 	},
 	[MODE_3]: {
 		radius: 3,
@@ -207,64 +208,6 @@ export const useSoccerHex = create((set) => ({
 		})),
 }));
 
-// export const useSoccerHex = (callback) => {
-// 	const soccerContext = useContext(SoccerContext);
-
-// 	return callback ? callback(soccerContext) : soccerContext;
-// };
-
-// export const SoccerContext = React.createContext({
-// 	play: false, // Play the animation
-// 	speed: 1, // 0.1 => 10
-// 	visibleCoordinates: true,
-// 	// Hexagons
-// 	visibleHexagons: true,
-// 	loadingHexagons: false,
-// 	hexagonMode: 1, // 0 => 1 radius, 1 => 2 radius, 2 => 3 radius, 3 => 4 radius
-// 	hexagons: [],
-// 	/**
-// 	 * This is a variable used to count when a event occurs and the hexagon is selected
-// 	 * Object with the following structure:
-// 	 * key: uuid of the hexagon
-// 	 * value = {
-// 	 * 		count: number of times an event occurs and the hexagon is selected
-// 	 *  	players: = {
-// 	 * 			[uuid]: {
-// 	 * 				events: []
-// 	 *              totalPoints: 0
-// 	 *
-// 	 * 			}
-// 	 * 		}
-// 	 * }
-// 	 *
-// 	 */
-// 	hexagonsInfo: {},
-// 	// Hexagons selected by the user. List of uuids
-// 	selectedHexagons: {}, // => { [uuid]: true] }
-// 	// Events
-// 	eventIndex: null,
-// 	events: [],
-// 	// Match
-// 	homeTeam: null,
-// 	awayTeam: null,
-// 	// Players
-// 	visiblePlayers: true,
-// 	players: [],
-// 	// Markers
-// 	visibleMarkers: true,
-// 	markers: [],
-// 	// Ball
-// 	ball: null,
-
-// 	// Methods
-// 	setHexagonMode: () => {},
-// 	addSelectedHexagon: () => {},
-// 	removeSelectedHexagon: () => {},
-// 	setMarkers: () => {},
-// 	setPlayers: () => {},
-// 	setBall: () => {},
-// });
-
 const SoccerHex = forwardRef(function SoccerHex(
 	{
 		boundingWidth = 120,
@@ -290,7 +233,15 @@ const SoccerHex = forwardRef(function SoccerHex(
 				<SoccerMarkersManager />
 				<SoccerInfoManager />
 				<SoccerDebugManager />
-				<Canvas>
+				<Canvas
+					onCreated={({ gl }) => {
+						gl.localClippingEnabled = true;
+					}}
+					camera={{
+						position: [0, 0, 100],
+						fov: 50,
+					}}
+				>
 					<React.Suspense fallback={null}>
 						<SoccerField width={120} height={80} />
 						<SoccerMarkers />
