@@ -3,6 +3,7 @@ import { useCallback, useEffect } from "react";
 import { useStatsBombData } from "../store";
 import { Vector2, Vector3 } from "three";
 import { relativeToPosition } from "../utils";
+import { shallow } from "zustand/shallow";
 
 const api = axios.create({
 	baseURL: "http://localhost:8000/api/",
@@ -17,10 +18,13 @@ const api = axios.create({
 // });
 
 export const useStatsBomb = () => {
-	const { setStatsBombData, setTeams } = useStatsBombData((state) => ({
-		setStatsBombData: state.setStatsBombData,
-		setTeams: state.setTeams,
-	}));
+	const { setStatsBombData, setTeams } = useStatsBombData(
+		(state) => ({
+			setStatsBombData: state.setStatsBombData,
+			setTeams: state.setTeams,
+		}),
+		shallow
+	);
 
 	const fetch = useCallback(async () => {
 		setStatsBombData([]);

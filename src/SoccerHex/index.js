@@ -1,3 +1,2 @@
-import SoccerHex from "./SoccerHex";
-
-export default SoccerHex;
+export * from "./SoccerHex";
+export * from "./SoccerSelectFormations";

@@ -1,9 +1,8 @@
 import React from "react";
-import { useSoccerHex } from "../SoccerHex/SoccerHex";
+import { useSoccerEvents } from "../SoccerHex/store";
 
 const Events = () => {
-	const events = useSoccerHex((state) => state.events);
-
+	const events = useSoccerEvents((state) => state.events);
 	const tdStyle = {
 		border: "1px solid black",
 		padding: "5px",

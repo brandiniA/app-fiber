@@ -1,16 +1,16 @@
-import React, { useMemo, useState } from "react";
-import { useSoccerHex } from "../SoccerHex/SoccerHex";
-import { EVENTS_TO_SHOW } from "../SoccerHex/SoccerInfoManager";
+import React, { useState } from "react";
+import { useSoccerHexagons, useSoccerInfo } from "../SoccerHex/store";
+import { EVENTS_TO_SHOW } from "../SoccerHex/SoccerManagers/SoccerInfoManager";
 
 export const HexagonsInfo = () => {
 	const [tabSelected, setTabSelected] = useState("hexagons");
-	const { hexagons, hexagonsInfo } = useSoccerHex((state) => ({
-		hexagons: state.hexagons,
-		hexagonsInfo: Object.keys(state.hexagonsInfo).map((key) => ({
+	const hexagons = useSoccerHexagons((state) => state.hexagons);
+	const hexagonsInfo = useSoccerInfo((state) =>
+		Object.keys(state.hexagonsInfo).map((key) => ({
 			hexagonUUID: key,
 			...state.hexagonsInfo[key],
-		})),
-	}));
+		}))
+	);
 
 	const tdStyle = {
 		border: "1px solid black",
@@ -92,7 +92,7 @@ export const HexagonsInfo = () => {
 								<tbody>
 									{hexagonsInfo.map((hexagonWithPlayer) => (
 										<tr
-											key={hexagonWithPlayer.key}
+											key={hexagonWithPlayer.hexagonUUID}
 											style={{ border: "1px solid black" }}
 										>
 											<td

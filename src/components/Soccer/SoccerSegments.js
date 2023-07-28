@@ -5,6 +5,7 @@ import { useApp, useHexagons, useMarkers } from "../../store";
 import { generateHexagons } from "./../../utils";
 import { Vector3 } from "three";
 import { generateUUID } from "three/src/math/MathUtils";
+import { shallow } from "zustand/shallow";
 
 const MODE_1 = 0;
 const MODE_2 = 1;
@@ -54,11 +55,14 @@ export const SoccerSegments = ({ width = 120, height = 80 }) => {
 	}, [hexagonMode, hexagons.length]);
 
 	const { selectedHexagons, addSelectedHexagon, removeSelectedHexagon } =
-		useHexagons((state) => ({
-			selectedHexagons: state.selectedHexagons,
-			addSelectedHexagon: state.addSelectedHexagon,
-			removeSelectedHexagon: state.removeSelectedHexagon,
-		}));
+		useHexagons(
+			(state) => ({
+				selectedHexagons: state.selectedHexagons,
+				addSelectedHexagon: state.addSelectedHexagon,
+				removeSelectedHexagon: state.removeSelectedHexagon,
+			}),
+			shallow
+		);
 
 	// const moved = useCameraInteractor((state) => state.controlsState.moved);
 

@@ -2,7 +2,8 @@ import React, { useEffect, useMemo, useRef } from "react";
 import { Cylinder, Html } from "@react-three/drei";
 import GUI from "lil-gui";
 
-import { useSoccerHex } from "../SoccerHex";
+import { useSoccerMarkers } from "../store";
+import { shallow } from "zustand/shallow";
 
 export const SoccerMarker = ({
 	radius,
@@ -15,7 +16,12 @@ export const SoccerMarker = ({
 }) => {
 	const mesh = useRef();
 
-	const visibleMarkers = useSoccerHex((state) => state.visibleMarkers);
+	const { visibleMarkers } = useSoccerMarkers(
+		(state) => ({
+			visibleMarkers: state.visibleMarkers,
+		}),
+		shallow
+	);
 
 	const initialSetup = () => {
 		mesh.current.position.set(...position);

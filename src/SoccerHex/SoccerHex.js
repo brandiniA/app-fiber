@@ -1,38 +1,26 @@
-import React, {
-	forwardRef,
-	useCallback,
-	useContext,
-	useEffect,
-	useImperativeHandle,
-	useRef,
-	useState,
-} from "react";
+import React, { forwardRef } from "react";
 
 import { Canvas } from "@react-three/fiber";
 import { CameraManager } from "./CameraManager";
 import { SoccerField } from "./SoccerField/SoccerField";
-import {
-	generateRandomUUID,
-	positionToRelative,
-	relativeToPosition,
-	sleepAsync,
-} from "../utils";
 import SoccerMarkers from "./SoccerMarkers";
-import { Vector3 } from "three";
 import SoccerPlayers from "./SoccerPlayers";
-import { useStatsBomb } from "../api";
-import { useGui } from "../store";
-import GUI from "lil-gui";
-import { SoccerEventsManager } from "./SoccerEventsManager";
-import { SoccerHexagonsManager } from "./SoccerHexagonsManager";
-import { SoccerMarkersManager } from "./SoccerMarkersManager";
-import { SoccerPlayersManager } from "./SoccerPlayersManager";
-import { SoccerInfoManager } from "./SoccerInfoManager";
+import SoccerFieldSegments from "./SoccerFieldSegments";
+import {
+	SoccerEventsManager,
+	SoccerDebugManager,
+	SoccerMarkersManager,
+	SoccerInfoManager,
+	SoccerHexagonsManager,
+	SoccerPlayersManager,
+} from "./SoccerManagers";
+// import { SoccerHexagonsManager } from "./SoccerHexagonsManager";
+// import { SoccerMarkersManager } from "./SoccerMarkersManager";
+// import { SoccerPlayersManager } from "./SoccerPlayersManager";
+// import { SoccerInfoManager } from "./SoccerInfoManager";
 import { HexagonsInfo } from "../components/HexagonsInfo";
 import Events from "../components/Events";
-import { create } from "zustand";
-import { SoccerDebugManager } from "./SoccerDebugManager";
-import { Sky } from "@react-three/drei";
+import { SoccerFieldCoordinates } from "./SoccerFieldCoordinates";
 
 export const MODE_1 = 0;
 export const MODE_2 = 1;
@@ -58,163 +46,8 @@ export const HEX_MODE = {
 	},
 };
 
-const soccerHexDefaultValues = {
-	// Play the animation
-	play: false,
-	// Speed of the animation
-	speed: 1, // 0.1 => 10
-	visibleCoordinates: true,
-	loadingHexagons: false,
-	hexagonsInfo: {},
-	// Hexagons selected by the user. List of uuids
-	selectedHexagons: {}, // => { [uuid]: true] }
-	// Hexagons
-	hexagonMode: 1, // 0 => 1 radius, 1 => 2 radius, 2 => 3 radius, 3 => 4 radius
-	visibleHexagons: true,
-	hexagons: [],
-	// Index of the current event
-	eventIndex: null,
-	events: [],
-	ball: null,
-	match: null,
-	visiblePlayers: true,
-	players: [],
-	visibleMarkers: true,
-	markers: [],
-};
-
-export const useSoccerHex = create((set) => ({
-	...soccerHexDefaultValues,
-	// Methods
-	setDefault: () =>
-		set((state) => ({
-			...soccerHexDefaultValues,
-		})),
-
-	setPlay: (play) =>
-		set((state) => ({
-			...state,
-			play,
-		})),
-	setSpeed: (speed) =>
-		set((state) => ({
-			...state,
-			speed,
-		})),
-	setVisibleCoordinates: (visibleCoordinates) =>
-		set((state) => ({
-			...state,
-			visibleCoordinates,
-		})),
-	setHexagons: (hexagons, loadingHexagons = false) =>
-		set((state) => ({
-			...state,
-			hexagons,
-			loadingHexagons,
-		})),
-	setHexagonMode: (hexagonMode) =>
-		set((state) => ({
-			...state,
-			hexagonMode,
-		})),
-	setVisibleHexagons: (visibleHexagons) =>
-		set((state) => ({
-			...state,
-			visibleHexagons,
-		})),
-	addSelectedHexagon: (uuid) =>
-		set((state) => ({
-			...state,
-			selectedHexagons: {
-				...state.selectedHexagons,
-				[uuid]: true,
-			},
-		})),
-	removeSelectedHexagon: (uuid) =>
-		set((state) => ({
-			...state,
-			selectedHexagons: Object.keys(state.selectedHexagons).reduce(
-				(acc, key) => {
-					if (key !== uuid) {
-						acc[key] = true;
-					}
-					return acc;
-				},
-				{}
-			),
-		})),
-
-	setHexagonInfo: (hexagonUUID, hexagonInfo) =>
-		set((state) => ({
-			...state,
-			hexagonsInfo: {
-				...state.hexagonsInfo,
-				[hexagonUUID]: hexagonInfo,
-			},
-		})),
-
-	updateHexagonInfo: (hexagonUUID, hexagonInfo) =>
-		set((state) => ({
-			...state,
-			hexagonsInfo: {
-				...state.hexagonsInfo,
-				[hexagonUUID]: {
-					...state.hexagonsInfo[hexagonUUID],
-					...hexagonInfo,
-				},
-			},
-		})),
-	clearHexagonInfo: () =>
-		set((state) => ({
-			...state,
-			hexagonsInfo: {},
-		})),
-	setEvents: ({ homeTeam, awayTeam, events }) =>
-		set((state) => ({
-			...state,
-			events,
-			homeTeam,
-			awayTeam,
-		})),
-	setEventIndex: (eventIndex) =>
-		set((state) => ({
-			...state,
-			eventIndex,
-		})),
-	setPlayers: (players) =>
-		set((state) => ({
-			...state,
-			players,
-		})),
-	setVisiblePlayers: (visiblePlayers) =>
-		set((state) => ({
-			...state,
-			visiblePlayers,
-		})),
-	setMarkers: (markers) =>
-		set((state) => ({
-			...state,
-			markers,
-		})),
-	setVisibleMarkers: (visibleMarkers) =>
-		set((state) => ({
-			...state,
-			visibleMarkers,
-		})),
-	setBall: (ball) =>
-		set((state) => ({
-			...state,
-			ball,
-		})),
-}));
-
-const SoccerHex = forwardRef(function SoccerHex(
-	{
-		boundingWidth = 120,
-		boundingHeight = 80,
-		initialValues = {},
-		// players = [],
-	},
+export const SoccerHex = forwardRef(function SoccerHex(
+	{ boundingWidth = 120, boundingHeight = 80, initialValues = {} },
 	ref
 ) {
 	return (
@@ -244,6 +77,15 @@ const SoccerHex = forwardRef(function SoccerHex(
 				>
 					<React.Suspense fallback={null}>
 						<SoccerField width={120} height={80} />
+
+						<SoccerFieldSegments
+							width={boundingWidth}
+							height={boundingHeight}
+						/>
+						<SoccerFieldCoordinates
+							width={boundingWidth}
+							height={boundingHeight}
+						/>
 						<SoccerMarkers />
 						<SoccerPlayers />
 					</React.Suspense>
@@ -267,5 +109,3 @@ const SoccerHex = forwardRef(function SoccerHex(
 		</React.Fragment>
 	);
 });
-
-export default SoccerHex;

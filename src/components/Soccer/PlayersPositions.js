@@ -11,19 +11,26 @@ import {
 import useDeepCompareEffect from "../../hooks/useDeepCompareEffect";
 import { generateRandomUUID, sleepAsync } from "../../utils";
 import { Vector3 } from "three";
+import { shallow } from "zustand/shallow";
 
 const EVENTS_EXCLUDED = ["Pass", "Ball Receipt*", "Carry", "Pressure"];
 
 export const PlayersPositions = () => {
-	const { statsBombData, teams } = useStatsBombData((state) => ({
-		statsBombData: state.statsBombData,
-		teams: state.teams,
-	}));
+	const { statsBombData, teams } = useStatsBombData(
+		(state) => ({
+			statsBombData: state.statsBombData,
+			teams: state.teams,
+		}),
+		shallow
+	);
 
-	const { players, setPlayers } = usePlayers((state) => ({
-		players: state.players,
-		setPlayers: state.setPlayers,
-	}));
+	const { players, setPlayers } = usePlayers(
+		(state) => ({
+			players: state.players,
+			setPlayers: state.setPlayers,
+		}),
+		shallow
+	);
 
 	const setMarkers = useMarkers((state) => state.setMarkers);
 	const updateHexagon = useHexagons((state) => state.updateHexagon);

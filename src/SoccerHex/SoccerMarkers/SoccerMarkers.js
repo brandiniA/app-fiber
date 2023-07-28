@@ -1,8 +1,8 @@
 import React from "react";
 import { SoccerMarker } from "./SoccerMarker";
-import { useSoccerHex } from "../SoccerHex";
+import { useSoccerMarkers } from "../store";
 export const SoccerMarkers = () => {
-	const markers = useSoccerHex((state) => state.markers);
+	const markers = useSoccerMarkers((state) => state.markers);
 
 	return (
 		<>
